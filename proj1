@@ -1,0 +1,29 @@
+#!/bin/bash
+
+printFile () {
+	if [ -h "$1" ]
+		then
+			linkTo=`ls -l $1 | sed 's/.*-> //'`
+			echo "$1 Symbolic link $linkTo"
+	elif [ -f "$1" ]
+		then
+			fileSize=`ls -l $1 | awk '{print $5}'`
+			fileType=`file $1 | sed 's/.*: //'`
+			echo "$1 $fileSize $fileType"
+	elif [ -d "$1" ]
+		then
+			find $1 -name '*' | while read line; do
+				if [ ! -d "$line" ]
+					then
+						printFile $line
+				fi
+			done
+	else
+		echo "$1 unknown"
+	fi
+}
+
+for arg in "$@"
+do
+	printFile "$arg"
+done
